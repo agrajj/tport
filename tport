@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# tport <session> — jump to a fleet tmux session. If already inside tmux,
+# switches the current client directly; otherwise attaches (detaching any
+# other client already on that session first).
+set -euo pipefail
+
+target="${1:-}"
+if [ -z "$target" ]; then
+  echo "usage: tport <tmux-session-name>" >&2
+  exit 1
+fi
+
+if ! tmux has-session -t "$target" 2>/dev/null; then
+  echo "no such tmux session: $target" >&2
+  exit 1
+fi
+
+if [ -n "${TMUX:-}" ]; then
+  exec tmux switch-client -t "$target"
+else
+  exec tmux attach -d -t "$target"
+fi

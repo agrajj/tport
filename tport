@@ -11,7 +11,10 @@ if [ -z "$target" ]; then
 fi
 
 if ! tmux has-session -t "$target" 2>/dev/null; then
-  echo "no such tmux session: $target" >&2
+  read -r -p "Session '$target' not found. Create it? [y/N] " confirm
+  if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    exec tmux new-session -s "$target"
+  fi
   exit 1
 fi
 
